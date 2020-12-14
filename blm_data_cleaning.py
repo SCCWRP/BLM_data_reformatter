@@ -2,12 +2,12 @@ import pandas as pd
 from pandasgui import show
 
 
-relationships_analytes = pd.ExcelFile("C:/Users/toled/Desktop/SCCWRP/RelationshipMap.xlsx").parse('Analytes')
-relationships_columns = pd.ExcelFile("C:/Users/toled/Desktop/SCCWRP/RelationshipMap.xlsx").parse('Columns')
+relationships_analytes = pd.ExcelFile("RelationshipMap.xlsx").parse('Analytes')
+relationships_columns = pd.ExcelFile("RelationshipMap.xlsx").parse('Columns')
 # this is the original dataset
 
 
-sccwrp_xls = pd.ExcelFile("C:/Users/toled/Desktop/SCCWRP/SCCWRP_SWAMP_FieldDataSheet.xlsx")
+sccwrp_xls = pd.ExcelFile("SCCWRP_SWAMP_FieldDataSheet.xlsx")
 sccwrp_field_results = sccwrp_xls.parse('sccwrp_swamp_fielddatasheet_0')
 
 # create field analytes
