@@ -30,29 +30,29 @@ habitat = {
     **relationships_analytes.loc[habitat_filter, ['OriginalAnalyteName', 'UnitName']].set_index('OriginalAnalyteName').to_dict()
 }
 
+
+
 # create melted field data
 field_tabs = ['All', 'FieldResults']
 
 field_IDvars = relationships_columns.loc[relationships_columns['Tab'].isin(field_tabs), 'OriginalColumn']
 field_melt_dat = pd.melt(sccwrp_field_results, id_vars=field_IDvars, value_vars=list(field['AnalyteName']))
 
+# I want to preserve the original Analytename to set locationcodes to what they need to be for certain analytes
+# It will also help us assign correct replicate numbers for the Dupes
+field_melt_dat.rename(columns = {"variable": "OriginalAnalyteName", "value": "Result"}, inplace = True)
 
-field_melt_dat['MatrixName'] = field_melt_dat['variable']
-field_melt_dat['MatrixName'].replace(field['MatrixName'], inplace=True)
-
-
-field_melt_dat['UnitName'] = field_melt_dat['variable']
-field_melt_dat['UnitName'].replace(field['UnitName'], inplace=True)
-
-
-field_melt_dat["variable"].replace(field['AnalyteName'], inplace=True)
-field_melt_dat.rename(
-    columns= {
-        'variable': 'Analyte',
-        'value': 'Result'
-    }, 
-    inplace=True
+# We can use assign to create the new columns in this one line (technically its one line)
+# Very clean, fast and efficient way of going about this whole process, 
+# I'm impressed and it is certainly better than how i would have done it
+# Here i am just adding some syntactic sugar
+field_melt_dat = field_melt_dat.assign(
+    MatrixName = field_melt_dat['OriginalAnalyteName'].replace(field['MatrixName']),
+    UnitName = field_melt_dat['OriginalAnalyteName'].replace(field['UnitName']),
+    AnalyteName = field_melt_dat["OriginalAnalyteName"].replace(field['AnalyteName'])
 )
+
+
 
 field_melt_dat['SampleDuplicatesTaken'].fillna(1,inplace=True)
 field_melt_dat['SampleDuplicatesTaken'].replace({'Yes': int(2), 'No': int(1)}, inplace=True)
@@ -70,25 +70,12 @@ habitat_tabs = ['All', 'HabitatResults']
 habitat_IDvars = relationships_columns.loc[relationships_columns['Tab'].isin(habitat_tabs), 'OriginalColumn']
 habitat_melt_dat = pd.melt(sccwrp_field_results, id_vars=habitat_IDvars, value_vars=list(habitat['AnalyteName']))
 
-habitat_melt_dat["variable"].replace(habitat['AnalyteName'], inplace=True)
+habitat_melt_dat.rename(columns= {'variable': 'OriginalAnalyteName', 'value': 'Result'}, inplace=True)
 
-
-habitat_melt_dat['MatrixName'] = habitat_melt_dat['variable']
-habitat_melt_dat['MatrixName'].replace(habitat['MatrixName'], inplace=True)
-
-
-habitat_melt_dat['UnitName'] = habitat_melt_dat['variable']
-habitat_melt_dat['UnitName'].replace(habitat['UnitName'], inplace=True)
-
-
-habitat_melt_dat["variable"].replace(habitat['AnalyteName'], inplace=True)
-
-habitat_melt_dat.rename(
-    columns= {
-        'variable': 'Analyte',
-        'value': 'Result'
-    }, 
-    inplace=True
+habitat_melt_dat = habitat_melt_dat.assign(
+    MatrixName = habitat_melt_dat['OriginalAnalyteName'].replace(habitat['MatrixName']),
+    UnitName = habitat_melt_dat['OriginalAnalyteName'].replace(habitat['UnitName']),
+    AnalyteName = habitat_melt_dat["OriginalAnalyteName"].replace(habitat['AnalyteName'])
 )
 
 habitat_melt_dat['HabitatReplicate'].fillna(1, inplace=True)
@@ -101,7 +88,7 @@ habitat_results_dat = habitat_melt_dat[-habitat_duplicates_filter]
 # create excel file with field/habitat results as sheets
 blm_swampformat = pd.ExcelWriter('output/blm_swampformat.xlsx', engine='xlsxwriter')
 
-field_results_dat.sort_values(['StationID','SampleDate']).to_excel(blm_swampformat, sheet_name='FieldResults')
-habitat_results_dat.sort_values(['StationID','SampleDate']).to_excel(blm_swampformat, sheet_name='HabitatResults')
+field_results_dat.sort_values(['StationID','SampleDate']).to_excel(blm_swampformat, sheet_name='FieldResults', index = False)
+habitat_results_dat.sort_values(['StationID','SampleDate']).to_excel(blm_swampformat, sheet_name='HabitatResults', index = False)
 
 blm_swampformat.save()
