@@ -32,10 +32,6 @@ Habitat_Matrix_Name = Habitat_matrix_dict['MatrixName']
 Habitat_Analytes = Habitat_analytes_dict['AnalyteName']
 Habitat_UnitName = Habitat_unitname_dict['UnitName']
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 79ae24f4a74e95fcfa7874bd658ae291078ffc22
 # create melted field data
 
 field_tabs = ['All', 'FieldResults']
@@ -56,9 +52,6 @@ field_melt_dat["variable"].replace(Field_Analytes, inplace=True)
 field_melt_dat.rename(columns= {'variable': 'Analyte',
                        'value': 'Result'}, inplace=True)
 
-<<<<<<< HEAD
-
-=======
 field_melt_dat['SampleDuplicatesTaken'].fillna(1,inplace=True)
 field_melt_dat['SampleDuplicatesTaken'].replace({'Yes': int(2), 'No': int(1)}, inplace=True)
 
@@ -66,7 +59,6 @@ field_duplicates_filter = ((field_melt_dat['SampleDuplicatesTaken'] ==1) & (fiel
 field_results_dat = field_melt_dat[-field_duplicates_filter]
 
 field_results_dat['Result'].fillna(-88,inplace=True)
->>>>>>> 79ae24f4a74e95fcfa7874bd658ae291078ffc22
 
 
 # create melted habitat data
@@ -92,29 +84,19 @@ habitat_melt_dat["variable"].replace(Habitat_Analytes, inplace=True)
 habitat_melt_dat.rename(columns= {'variable': 'Analyte',
                        'value': 'Result'}, inplace=True)
 
-<<<<<<< HEAD
-=======
 habitat_melt_dat['HabitatReplicate'].fillna(1, inplace=True)
 habitat_melt_dat['HabitatReplicate'].replace({'No': int(1)}, inplace=True)
 
 habitat_duplicates_filter = ((habitat_melt_dat['HabitatReplicate'] == 1) & (habitat_melt_dat['Result'].isna()))
 habitat_results_dat = habitat_melt_dat[-habitat_duplicates_filter]
->>>>>>> 79ae24f4a74e95fcfa7874bd658ae291078ffc22
 
 
 
 
-<<<<<<< HEAD
-blm_swampformat = pd.ExcelWriter('blm_swampformat.xlsx', engine='xlsxwriter')
-
-field_melt_dat.to_excel(blm_swampformat, sheet_name='FieldResults')
-habitat_melt_dat.to_excel(blm_swampformat, sheet_name='HabitatResults')
-=======
 # create excel file with field/habitat results as sheets
 blm_swampformat = pd.ExcelWriter('blm_swampformat.xlsx', engine='xlsxwriter')
 
 field_results_dat.to_excel(blm_swampformat, sheet_name='FieldResults')
 habitat_results_dat.to_excel(blm_swampformat, sheet_name='HabitatResults')
->>>>>>> 79ae24f4a74e95fcfa7874bd658ae291078ffc22
 
 blm_swampformat.save()
