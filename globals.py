@@ -5,7 +5,11 @@ relmap = {
     'columns'  : pd.ExcelFile("input/RelationshipMap.xlsx").parse('Columns')   
 }
 
+<<<<<<< HEAD
 # I could have totally not defined the relmap variable above.. 
+=======
+# could have totally not defined the relmap variable above.. 
+>>>>>>> 4e90f803f9870d8883ea084b2ec64fbe163ce2ef
 # its ok though
 relationships_analytes = relmap['analytes']
 relationships_columns = relmap['columns']
