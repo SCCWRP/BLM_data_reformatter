@@ -1,9 +1,9 @@
 import pandas as pd
 from pandasgui import show
 
-from globals import sccwrp_field_results, relmap, relationships_analytes, relationships_columns, field_ordered_cols
+from globalvariables import relmap, relationships_analytes, relationships_columns, field_ordered_cols
 
-def field():
+def field(rawdata):
 
     # create field analytes
     field_filter = relationships_analytes["AnalyteNameType"] == "Field"
@@ -19,7 +19,7 @@ def field():
     field_tabs = ['All', 'FieldResults']
 
     field_IDvars = relationships_columns.loc[relationships_columns['Tab'].isin(field_tabs), 'OriginalColumn']
-    field_melt_dat = pd.melt(sccwrp_field_results, id_vars=field_IDvars, value_vars=list(field_relmap['AnalyteName']))
+    field_melt_dat = pd.melt(rawdata, id_vars=field_IDvars, value_vars=list(field_relmap['AnalyteName']))
 
     # I want to preserve the original Analytename to set locationcodes to what they need to be for certain analytes
     # It will also help us assign correct replicate numbers for the Dupes
@@ -83,13 +83,14 @@ def field():
     # Tack on the units
     field_results_dat = field_results_dat.merge(
         pd.melt(
-            sccwrp_field_results, 
+            rawdata, 
             id_vars = ['StationID','SampleDate'], 
-            value_vars = [x for x in field_relmap['UnitName'].values() if x in sccwrp_field_results.columns]
+            value_vars = [x for x in field_relmap['UnitName'].values() if x in rawdata.columns]
         ) \
         .rename(
             columns = {'variable':'UnitName'}
-        ),
+        ) \
+        .drop_duplicates(),
         on = ['StationID','SampleDate','UnitName'],
         how = 'left'
     ) \
@@ -111,7 +112,6 @@ def field():
         # Need to ask Dario about CollectionDevice, etc
         # We can probably enter manually in excel. Its in the data sheet, but seems like not all info is there
         # (InstrumentAir and InstrumentWater columns)
-        CalibrationDate = '',
         CollectionDeviceName = ''
     )
 

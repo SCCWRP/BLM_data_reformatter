@@ -1,9 +1,9 @@
 import pandas as pd
 from pandasgui import show
 
-from globals import sccwrp_field_results, relmap, relationships_analytes, relationships_columns, habitat_ordered_cols
+from globalvariables import relmap, relationships_analytes, relationships_columns, habitat_ordered_cols
 
-def habitat():
+def habitat(rawdata):
     # create habitat analytes
     habitat_filter = relationships_analytes["AnalyteNameType"] == "Habitat"
 
@@ -20,7 +20,7 @@ def habitat():
     habitat_tabs = ['All', 'HabitatResults']
 
     habitat_IDvars = relationships_columns.loc[relationships_columns['Tab'].isin(habitat_tabs), 'OriginalColumn']
-    habitat_melt_dat = pd.melt(sccwrp_field_results, id_vars=habitat_IDvars, value_vars=list(habitat_relmap['AnalyteName']))
+    habitat_melt_dat = pd.melt(rawdata, id_vars=habitat_IDvars, value_vars=list(habitat_relmap['AnalyteName']))
 
     # No need to preserve original analytename in habitat
     habitat_melt_dat = habitat_melt_dat.assign(
