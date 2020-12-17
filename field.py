@@ -99,6 +99,23 @@ def field(rawdata):
         columns = {'value':'UnitName'}
     )
 
+    # Get the CollectionDeviceNames
+    field_results_dat = field_results_dat.merge(
+        pd.melt(
+            rawdata[['StationID','SampleDate','InstrumentAir','InstrumentWater']] \
+            .rename(columns = {'InstrumentAir': 'air', 'InstrumentWater': 'samplewater'}) \
+            .fillna("Not Recorded"), 
+            id_vars = ['StationID','SampleDate'], 
+            value_vars = ['air','samplewater']
+        ) \
+        .rename(
+            columns = {'variable':'MatrixName', 'value' : 'CollectionDeviceName'}
+        ) \
+        .drop_duplicates(),
+        on = ['StationID','SampleDate','MatrixName'],
+        how = 'left'
+    )
+
     # fill in the blanks
     field_results_dat = field_results_dat.assign(
         BatchVerificationCode = '', 
@@ -112,7 +129,7 @@ def field(rawdata):
         # Need to ask Dario about CollectionDevice, etc
         # We can probably enter manually in excel. Its in the data sheet, but seems like not all info is there
         # (InstrumentAir and InstrumentWater columns)
-        CollectionDeviceName = ''
+        #CollectionDeviceName = ''
     )
 
     field_results_dat = field_results_dat \
