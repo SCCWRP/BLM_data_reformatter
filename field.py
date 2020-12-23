@@ -1,5 +1,4 @@
 import pandas as pd
-from pandasgui import show
 
 from globalvariables import relmap, relationships_analytes, relationships_columns, field_ordered_cols
 
@@ -127,7 +126,7 @@ def field(rawdata):
     # fill in the blanks
     field_results_dat = field_results_dat.assign(
         BatchVerificationCode = '', 
-        QACode = '', 
+        QACode = 'NR', 
         ComplianceCode = '',
         ResQualCode = "=",
         UnitName = field_results_dat \

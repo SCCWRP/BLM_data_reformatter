@@ -1,5 +1,4 @@
 import pandas as pd
-from pandasgui import show
 
 from globalvariables import relmap, relationships_analytes, relationships_columns, habitat_ordered_cols
 

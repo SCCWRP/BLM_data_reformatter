@@ -1,5 +1,5 @@
 import pandas as pd
-from pandasgui import show
+import re
 
 from globalvariables import \
     relmap, \
@@ -21,7 +21,7 @@ def samplehistory(rawdata):
     newdata = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][samplehistory_ordered_cols]
     newdata.PurposeFailureName = newdata.PurposeFailureName.str.replace("Dry_NoWater_","Dry (no water)")
     newdata.SamplePurposeCode = "WaterChem" # Wont accept FieldMeasure and WaterChem
-    newdata.UnitElevation = "m" # This is literally the only value they accept for this column
+    
     return newdata
 
 def personnel(rawdata):
@@ -59,5 +59,12 @@ def locations(rawdata):
         axis = 1
     )
     newdata.CoordinateNumber = 1
-    newdata.OccupationMethod = newdata.OccupationMethod.str.replace("WalkIn","Walk In")
+    newdata.OccupationMethod = newdata.OccupationMethod \
+        .apply(
+            lambda x:
+            "Walk In"
+            if bool(re.search("walk\s*in",str(x).lower()))
+            else x
+        )
+    newdata.UnitElevation = "m" # This is literally the only value they accept for this column
     return newdata
