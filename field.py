@@ -1,4 +1,5 @@
 import pandas as pd
+from itertools import chain
 
 from globalvariables import relmap, relationships_analytes, relationships_columns, field_ordered_cols
 
@@ -66,21 +67,15 @@ def field(rawdata):
     field_results_dat.LocationCode = field_results_dat.apply(
         lambda x:
         x['LocationCode']
-        if "Flowmeter" not in x['OriginalAnalyteName']
+        if "Flowmeter" not in x['OriginalAnalyteName'] and x['OriginalAnalyteName'] != 'StationWaterDepth' 
         else
-        # May want to check with Dario here. Either way, no big deal if this one is wrong.
-        # It was definitely wrong last time we gave it to SWAMP
-        'Nominal' if x['OriginalAnalyteName'] == 'StationWaterDepth' 
+        'Nominal' if x['OriginalAnalyteName'] == 'StationWaterDepth'
         else
         'Bank, Left' if 'FlowmeterSect1' in x['OriginalAnalyteName']
         else
         'Midchannel' if 'FlowmeterSect2' in x['OriginalAnalyteName']
         else
-        'Midchannel2' 
-            if 'FlowmeterSect3' in x['OriginalAnalyteName'] 
-            and field_results_dat.Result[min(x.name + 1, max(field_results_dat.index))] != -88
-        else
-        'Midchannel3' if 'FlowmeterSect4' in x['OriginalAnalyteName'] and field_results_dat.Result[min(x.name + 1, max(field_results_dat.index))] != -88
+        'Midchannel2' if 'FlowmeterSect3' in x['OriginalAnalyteName']
         else
         'Bank, Right'
         ,
@@ -156,8 +151,8 @@ def field(rawdata):
     )
 
     field_results_dat = field_results_dat \
-        .sort_values(['StationID','SampleDate','AnalyteName']) \
-        .drop("OriginalAnalyteName", axis = 1)
+        .sort_values(['StationID','SampleDate','AnalyteName']) #\
+        #.drop("OriginalAnalyteName", axis = 1)
 
     col_filter = relmap['columns'].Tab.isin(['All','FieldResults'])
     field_results_dat.rename(
@@ -165,4 +160,6 @@ def field(rawdata):
         inplace = True
     )
     
-    return field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[field_ordered_cols]
+    return field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
+        list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
+    ]
