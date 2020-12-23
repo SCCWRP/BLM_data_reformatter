@@ -48,6 +48,8 @@ else:
         }
     )
 
+sccwrp_field_results.StationID = sccwrp_field_results.StationID.str.replace("BLM-RB4-","")
+
     
 
 
