@@ -130,14 +130,30 @@ def field(rawdata):
         QACode = '', 
         ComplianceCode = '',
         ResQualCode = "=",
-        UnitName = field_results_dat.UnitName.fillna("None"),
+        UnitName = field_results_dat \
+            .UnitName.fillna("None") \
+            .str.replace("_","/") \
+            .str.replace("µ","u") \
+            .str.replace("percent","%") \
+            .str.replace("degree\s*C","deg C", regex = True)
+        ,
         FieldReplicate = 1,
         # No info on fractionname in raw original data. Total is for Oxygen, Saturation or Dissolved Oxygen Concentration.
         FractionName = field_results_dat.AnalyteName.apply(lambda x: 'Total' if "Oxygen" in str(x) else 'None'),
         # Need to ask Dario about CollectionDevice, etc
         # We can probably enter manually in excel. Its in the data sheet, but seems like not all info is there
         # (InstrumentAir and InstrumentWater columns)
-        #CollectionDeviceName = ''
+        #CollectionDeviceName YSI Pro1020 should be YSI Pro1020
+        CollectionDeviceName = field_results_dat \
+            .apply(
+                lambda x:
+                'Wading Rod'
+                if x['MatrixName'] == 'habitat'
+                else 
+                x['CollectionDeviceName'].replace("YSIP","YSI P")
+                ,
+                axis = 1
+            )
     )
 
     field_results_dat = field_results_dat \

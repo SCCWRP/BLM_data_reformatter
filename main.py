@@ -48,18 +48,10 @@ else:
         }
     )
 
-sccwrp_field_results.StationID = sccwrp_field_results.StationID.str.replace("BLM-RB4-","")
-
-    
-
-
-
 try:
     month = int(args.month) if args.month else None
 except:
     raise Exception(f"The --month argument must be an integer from 1 to 12. You entered the value of {args.month}")
-
-
 
 # Project Name should always be Biotic Ligand Model
 sccwrp_field_results = sccwrp_field_results[
@@ -67,6 +59,18 @@ sccwrp_field_results = sccwrp_field_results[
     &
     ( True if month is None else sccwrp_field_results.SampleDate.apply(lambda x: x.month == month) )
 ]
+
+
+# clean up the stations a bit
+sccwrp_field_results.StationID = sccwrp_field_results.StationID.str.replace("BLM-RB4-","")
+
+# Put hte dates as strings like how SWAMP likes them
+for c in sccwrp_field_results.columns:
+    if "date" in c.lower():
+        sccwrp_field_results[c] = pd.to_datetime(sccwrp_field_results[c])
+
+
+
 
 # only run if there are records for the month they are asking for
 if sccwrp_field_results.empty:
@@ -80,7 +84,13 @@ output_filepath = f"output/blm_swampformat_{month_dict[month] if month else ''}.
 # use xlsxwriter to write the data out without the resqualcode equal signs getting interpreted as formulas
 # I am not sure if openpyxl also has a similar capability, but I do know how to do it with xlsxwriter
 with \
-pd.ExcelWriter(output_filepath, engine = 'xlsxwriter', options = {'strings_to_urls': False, 'strings_to_formulas': False}) \
+pd.ExcelWriter(
+    output_filepath, 
+    engine = 'xlsxwriter', 
+    date_format = 'dd/mmm/yyyy',
+    datetime_format = 'dd/mmm/yyyy',
+    options = {'strings_to_urls': False, 'strings_to_formulas': False}
+) \
 as writer:
     
     # Call each function and write to excel
@@ -90,6 +100,12 @@ as writer:
     locations(sccwrp_field_results).to_excel(writer, sheet_name = "Locations", index = False)
     field(sccwrp_field_results).to_excel(writer, sheet_name = "FieldResults", index = False)
     habitat(sccwrp_field_results).to_excel(writer, sheet_name = "HabitatResults", index = False)
+    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "BenthicResults") \
+        .to_excel(writer, sheet_name = "BenthicResults", index = False) 
+    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "ChemResults") \
+        .to_excel(writer, sheet_name = "ChemResults", index = False) 
+    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "LabBatch") \
+        .to_excel(writer, sheet_name = "LabBatch", index = False) 
 
     # Save it and we're done!
     writer.save()
@@ -106,5 +122,4 @@ with pd.ExcelWriter(output_filepath, engine = 'openpyxl') as writer:
             worksheet.column_dimensions[openpyxl.utils.get_column_letter(column_cells[0].column)].width = length
 
     writer.save()
-    writer.close()
 

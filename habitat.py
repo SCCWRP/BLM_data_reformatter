@@ -47,7 +47,7 @@ def habitat(rawdata):
         ) \
         .assign(
             BatchVerificationCode = '', 
-            QACode = '', 
+            QACode = "NR", 
             ComplianceCode = '',
             ResQualCode = "=",
             FractionName = 'None',

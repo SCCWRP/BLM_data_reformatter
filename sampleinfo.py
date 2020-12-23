@@ -18,7 +18,11 @@ def samplehistory(rawdata):
     col_filter = ( (relmap['columns'].Tab.isin(['All','SampleHistory'])) & ( ~relmap['columns'].Column.isin(['LocationCode','GeometryShape']) ) )
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
     
-    return rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][samplehistory_ordered_cols]
+    newdata = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][samplehistory_ordered_cols]
+    newdata.PurposeFailureName = newdata.PurposeFailureName.str.replace("Dry_NoWater_","Dry (no water)")
+    newdata.SamplePurposeCode = "WaterChem" # Wont accept FieldMeasure and WaterChem
+    newdata.UnitElevation = "m" # This is literally the only value they accept for this column
+    return newdata
 
 def personnel(rawdata):
     # All, or PersonnelDuty would get us the relevant columns... of course except LocationCode and GeometryShape. My mistake there
@@ -43,4 +47,17 @@ def locations(rawdata):
     col_filter = relmap['columns'].Tab.isin(['All','Locations'])
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
 
-    return rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][locations_ordered_cols]
+    newdata = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][locations_ordered_cols]
+    newdata.Hydromod = newdata.Hydromod.str.replace("ConcretChannel","ConChan")
+    newdata.Hydromod = newdata.apply(
+        lambda x: 
+        "Weir" if x['StationCode'] == 'SGR2-Wht'
+        else "Culvert" if x['StationCode'] == 'SGR3-Dam'
+        else "Dam" if x['StationCode'] == 'SGR3-Sjc'
+        else x['Hydromod']
+        ,
+        axis = 1
+    )
+    newdata.CoordinateNumber = 1
+    newdata.OccupationMethod = newdata.OccupationMethod.str.replace("WalkIn","Walk In")
+    return newdata
