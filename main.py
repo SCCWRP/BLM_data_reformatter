@@ -1,6 +1,9 @@
+from arcgis.gis import GIS
 import pandas as pd
 import xlsxwriter, openpyxl, argparse, sys
 from datetime import datetime
+
+pd.set_option("display.max_columns", 30)
 
 # Build the argument parser
 parser = argparse.ArgumentParser(prog='BLM Reformatter')
@@ -12,6 +15,7 @@ args = parser.parse_args()
 from field import field
 from habitat import habitat
 from sampleinfo import sample, samplehistory, personnel, locations
+from globalvariables import relmap
 
 month_dict = {
     1: 'Jan',  2: 'Feb',  3: 'Mar',  4: 'Apr',
@@ -20,8 +24,33 @@ month_dict = {
 }
 
 
-# These will be used to subset the raw data
-rawdatapath = args.file if args.file else "input/SCCWRP_SWAMP_FieldDataSheet.xlsx"
+if args.file:
+    # These will be used to subset the raw data
+    rawdatapath = args.file
+    # this is the original dataset
+    sccwrp_field_results = pd.read_excel(rawdatapath, sheet_name = 'sccwrp_swamp_fielddatasheet_0')
+else:
+    gis = GIS("https://www.arcgis.com","ReadOnly","92626$Harbor")
+    
+    #search_results = gis.content.search('title: sccwrp_landstationoccupationform', 'Feature Layer')
+    search_results = gis.content.search(f'title: SCCWRP_SWAMP_FieldDataSheet_v1', 'Feature Layer')
+    results = search_results[0]
+
+    # import into dataframe
+    sccwrp_field_results = results.layers[0].query().sdf
+    
+    # rename column to aliases
+    sccwrp_field_results = sccwrp_field_results.rename(
+        columns = {
+            x[0] : x[1] 
+            for x in zip(relmap['aliases'].OriginalColumnName, relmap['aliases'].Alias) 
+            if x[0] in sccwrp_field_results.columns
+        }
+    )
+
+    
+
+
 
 try:
     month = int(args.month) if args.month else None
@@ -29,8 +58,6 @@ except:
     raise Exception(f"The --month argument must be an integer from 1 to 12. You entered the value of {args.month}")
 
 
-# this is the original dataset
-sccwrp_field_results = pd.read_excel(rawdatapath, sheet_name = 'sccwrp_swamp_fielddatasheet_0')
 
 # Project Name should always be Biotic Ligand Model
 sccwrp_field_results = sccwrp_field_results[

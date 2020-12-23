@@ -19,7 +19,10 @@ def field(rawdata):
     field_tabs = ['All', 'FieldResults']
 
     field_IDvars = relationships_columns.loc[relationships_columns['Tab'].isin(field_tabs), 'OriginalColumn']
-    field_melt_dat = pd.melt(rawdata, id_vars=field_IDvars, value_vars=list(field_relmap['AnalyteName']))
+
+    print(rawdata[[c for c in rawdata.columns if list(rawdata.columns).count(c) > 1]])
+
+    field_melt_dat = pd.melt(rawdata.loc[~rawdata.index.duplicated(keep='first')], id_vars=field_IDvars, value_vars=list(field_relmap['AnalyteName']))
 
     # I want to preserve the original Analytename to set locationcodes to what they need to be for certain analytes
     # It will also help us assign correct replicate numbers for the Dupes
@@ -60,6 +63,7 @@ def field(rawdata):
 
     # Get the LocationCode based on OriginalAnalyteName
     # Complicated for Flowmeter Depth and Velocity
+    field_results_dat = field_results_dat.sort_values(['StationID','SampleDate','AnalyteName','OriginalAnalyteName'])
     field_results_dat.LocationCode = field_results_dat.apply(
         lambda x:
         x['LocationCode']
@@ -73,7 +77,11 @@ def field(rawdata):
         else
         'Midchannel' if 'FlowmeterSect2' in x['OriginalAnalyteName']
         else
-        'Midchannel2' if 'FlowmeterSect3' in x['OriginalAnalyteName'] and field_results_dat.Result[x.name + 1] != -88
+        'Midchannel2' 
+            if 'FlowmeterSect3' in x['OriginalAnalyteName'] 
+            and field_results_dat.Result[min(x.name + 1, max(field_results_dat.index))] != -88
+        else
+        'Midchannel3' if 'FlowmeterSect4' in x['OriginalAnalyteName'] and field_results_dat.Result[min(x.name + 1, max(field_results_dat.index))] != -88
         else
         'Bank, Right'
         ,

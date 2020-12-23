@@ -2,8 +2,11 @@ import pandas as pd
 # Read in the relationship map
 relmap = {
     'analytes' : pd.ExcelFile("input/RelationshipMap.xlsx").parse('Analytes'),
-    'columns'  : pd.ExcelFile("input/RelationshipMap.xlsx").parse('Columns')   
+    'columns'  : pd.ExcelFile("input/RelationshipMap.xlsx").parse('Columns'),
+    'aliases'  : pd.ExcelFile("input/RelationshipMap.xlsx").parse('Aliases'),
 }
+
+relmap['aliases'] = relmap['aliases'].dropna()
 
 # I could have totally not defined the relmap variable above.. 
 # its ok though
