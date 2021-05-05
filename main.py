@@ -113,13 +113,13 @@ as writer:
 
 # Use openpyxl to fit the columns to character width
 # I remember researching this before, and i don't think xlsxwriter has this kind of feature
-with pd.ExcelWriter(output_filepath, engine = 'openpyxl') as writer:
-    writer.book = openpyxl.load_workbook(output_filepath)
+# with pd.ExcelWriter(output_filepath, engine = 'openpyxl') as writer:
+#     writer.book = openpyxl.load_workbook(output_filepath)
 
-    for worksheet in writer.book._sheets:
-        for column_cells in worksheet.columns:
-            length = max(len(str(cell.value) if cell.value else "") for cell in column_cells) + 2
-            worksheet.column_dimensions[openpyxl.utils.get_column_letter(column_cells[0].column)].width = length
+#     for worksheet in writer.book._sheets:
+#         for column_cells in worksheet.columns:
+#             length = max(len(str(cell.value) if cell.value else "") for cell in column_cells) + 2
+#             worksheet.column_dimensions[openpyxl.utils.get_column_letter(column_cells[0].column)].width = length
 
-    writer.save()
+#     writer.save()
 

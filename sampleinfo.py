@@ -29,7 +29,7 @@ def personnel(rawdata):
     # We can fix that later
     col_filter = ( (relmap['columns'].Tab.isin(['All','PersonnelDuty'])) & ( ~relmap['columns'].Column.isin(['LocationCode','GeometryShape']) ) )
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
-    
+ 
     return \
     rawdata[list(relevant_cols)] \
         .melt(
