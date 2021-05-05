@@ -58,7 +58,7 @@ def field(rawdata):
     field_duplicates_filter = ((field_melt_dat['Replicate'] == 2) & (field_melt_dat['Result'].isna()))
     field_results_dat = field_melt_dat[-field_duplicates_filter]
 
-    field_results_dat['Result'].fillna(-88,inplace=True)
+    # field_results_dat['Result'].fillna(-88,inplace=True)
 
 
     # Get the LocationCode based on OriginalAnalyteName
@@ -160,6 +160,34 @@ def field(rawdata):
         inplace = True
     )
     
-    return field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
-        list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
-    ]
+    # return field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
+    #     list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
+    # ]
+    field_results_dat = field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
+          list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
+      ]
+
+    # Convert from m/s to knots (KTS) if the analyname is Windspeed, and change the unitname to "KTS"  
+    field_results_dat.Result = field_results_dat.apply(
+                lambda x: x.Result*1.94384 
+                    if x.AnalyteName =='WindSpeed' 
+                        else x.Result,
+                            axis = 1)
+    
+    # Change UnitName to KTS, MatrixName to habitant, MethodName to FieldObservation if AnalyteName is WindSpeed                        
+    field_results_dat.loc[field_results_dat['AnalyteName']=='WindSpeed','UnitName']='KTS'
+    field_results_dat.loc[field_results_dat['AnalyteName']=='WindSpeed','MatrixName']='habitat'
+    field_results_dat.loc[field_results_dat['AnalyteName']=='WindSpeed','MethodName']='FieldObservations'
+    
+    # Change FractionName to Total if AnalyteName is Salinity or SpecificConductivity
+    # Change UnitName to ppt if AnalyteName is Salinity 
+    field_results_dat.loc[(field_results_dat['AnalyteName']=='Salinity') | (field_results_dat['AnalyteName']=='SpecificConductivity'),'FractionName']= 'Total'
+    field_results_dat.loc[field_results_dat['AnalyteName']=='Salinity' ,'UnitName']= 'ppt'
+    
+    # Whenever the result is empty, fill the ResQualCode and QACOde with NR
+    field_results_dat.loc[field_results_dat.Result.isna(),'ResQualCode'] = 'NR'    
+    field_results_dat.loc[field_results_dat.Result.isna(),'QACode'] = 'NR'    
+    
+    return field_results_dat
+
+
