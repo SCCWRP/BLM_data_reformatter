@@ -8,7 +8,7 @@ pd.set_option("display.max_columns", 30)
 # Build the argument parser
 parser = argparse.ArgumentParser(prog='BLM Reformatter')
 parser.add_argument('--file', help = 'Path to the file that contains the raw data')
-parser.add_argument('--month', help = 'Path to the file that contains the raw data')
+parser.add_argument('--month', help = '5')
 args = parser.parse_args()
 
 # custom imports from the local files
@@ -22,7 +22,6 @@ month_dict = {
     5: 'May',  6: 'Jun',  7: 'Jul',  8: 'Aug',
     9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec',
 }
-
 
 if args.file:
     # These will be used to subset the raw data
@@ -47,6 +46,7 @@ else:
             if x[0] in sccwrp_field_results.columns
         }
     )
+#sccwrp_field_results = sccwrp_field_results[sccwrp_field_results['SampleDate'] >= pd.Timestamp('05-01-2021')]
 
 try:
     month = int(args.month) if args.month else None
@@ -77,9 +77,11 @@ if sccwrp_field_results.empty:
     print(f"No results found for month {month}")
     sys.exit()
 
-
+start_month = 5
+sccwrp_field_results = sccwrp_field_results[sccwrp_field_results['SampleDate'] >= pd.Timestamp(f'{start_month}-01-2021 00:00:00')]
 # output file path to be used both times the file gets written
-output_filepath = f"output/blm_swampformat_{month_dict[month] if month else ''}.xlsx"
+# output_filepath = f"output/blm_swampformat_{month_dict[month] if month else ''}.xlsx"
+output_filepath = f"output/blm_swampformat_{start_month}.xlsx"
 
 # use xlsxwriter to write the data out without the resqualcode equal signs getting interpreted as formulas
 # I am not sure if openpyxl also has a similar capability, but I do know how to do it with xlsxwriter
