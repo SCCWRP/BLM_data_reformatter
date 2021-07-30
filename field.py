@@ -123,7 +123,6 @@ def field(rawdata):
         BatchVerificationCode = '', 
         QACode = 'NR', 
         ComplianceCode = '',
-        ResQualCode = "=",
         UnitName = field_results_dat \
             .UnitName.fillna("None") \
             .str.replace("_","/") \
@@ -173,7 +172,8 @@ def field(rawdata):
                     if x.AnalyteName =='WindSpeed' 
                         else x.Result,
                             axis = 1)
-    
+
+    field_results_dat.Result = field_results_dat.Result.fillna(-88)
     # Change UnitName to KTS, MatrixName to habitant, MethodName to FieldObservation if AnalyteName is WindSpeed                        
     field_results_dat.loc[field_results_dat['AnalyteName']=='WindSpeed','UnitName']='KTS'
     field_results_dat.loc[field_results_dat['AnalyteName']=='WindSpeed','MatrixName']='habitat'
@@ -184,8 +184,8 @@ def field(rawdata):
     field_results_dat.loc[(field_results_dat['AnalyteName']=='Salinity') | (field_results_dat['AnalyteName']=='SpecificConductivity'),'FractionName']= 'Total'
     field_results_dat.loc[field_results_dat['AnalyteName']=='Salinity' ,'UnitName']= 'ppt'
     
-    # Whenever the result is empty, fill the ResQualCode and QACOde with NR
-    field_results_dat.loc[field_results_dat.Result.isna(),'ResQualCode'] = 'NR'    
+    # Whenever the result is empty, fill the ResQualCode with = and QACOde with NR
+    field_results_dat.loc[field_results_dat.Result == -88,'ResQualCode'] = '='    
     field_results_dat.loc[field_results_dat.Result.isna(),'QACode'] = 'NR'    
     
     return field_results_dat

@@ -9,8 +9,10 @@ def sample(rawdata):
     # Looks like I goofed when I put all .... 
     col_filter = ( (relmap['columns'].Tab == 'All') & ( ~relmap['columns'].Column.isin(['LocationCode','GeometryShape']) ) )
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
-    
-    return rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][sample_ordered_cols]
+    df = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][sample_ordered_cols]
+    # Fix common mistakes in df
+    df.loc[df['AnalyteName']=='Salinity' ,'UnitName']= 'ppt'
+    return 
 
 def samplehistory(rawdata):
     # All, or SampleHistory would get us the relevant columns... of course except LocationCode and GeometryShape. My mistake there
