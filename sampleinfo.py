@@ -11,8 +11,10 @@ def sample(rawdata):
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
     df = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][sample_ordered_cols]
     # Fix common mistakes in df
-    df.loc[df['AnalyteName']=='Salinity' ,'UnitName']= 'ppt'
-    return 
+    df['AgencyCode'] = df['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
+    df['ProtocolCode'] = df['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+
+    return df
 
 def samplehistory(rawdata):
     # All, or SampleHistory would get us the relevant columns... of course except LocationCode and GeometryShape. My mistake there
@@ -23,7 +25,11 @@ def samplehistory(rawdata):
     newdata = rawdata.rename(columns = relevant_cols)[list(relevant_cols.values())][samplehistory_ordered_cols]
     newdata.PurposeFailureName = newdata.PurposeFailureName.str.replace("Dry_NoWater_","Dry (no water)")
     newdata.SamplePurposeCode = "WaterChem" # Wont accept FieldMeasure and WaterChem
-    
+    newdata['AgencyCode'] = newdata['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
+    newdata['PurposeFailureName'] = newdata['PurposeFailureName'].fillna('None')
+    newdata['ProtocolCode'] = newdata['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+
+
     return newdata
 
 def personnel(rawdata):
@@ -31,9 +37,7 @@ def personnel(rawdata):
     # We can fix that later
     col_filter = ( (relmap['columns'].Tab.isin(['All','PersonnelDuty'])) & ( ~relmap['columns'].Column.isin(['LocationCode','GeometryShape']) ) )
     relevant_cols = {v[0]:v[1] for v in  zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }
- 
-    return \
-    rawdata[list(relevant_cols)] \
+    df =     rawdata[list(relevant_cols)] \
         .melt(
             id_vars = list(set(relevant_cols.keys()) - {'TeamLeader','OtherTeamMembers'}), 
             value_vars = ['TeamLeader','OtherTeamMembers']
@@ -43,6 +47,11 @@ def personnel(rawdata):
         .drop('variable', axis = 1) \
         .dropna(subset = ['PersonnelCode','PersonnelDutyCode'], how = 'all') \
         [personnel_ordered_cols]
+    df['AgencyCode'] = df['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")    
+    df['ProtocolCode'] = df['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+
+    return df
+
 
 def locations(rawdata):
     # All, or Locations, would be the relevant columns here
@@ -69,4 +78,7 @@ def locations(rawdata):
             else x
         )
     newdata.UnitElevation = "m" # This is literally the only value they accept for this column
+    newdata['AgencyCode'] = newdata['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
+    newdata['ProtocolCode'] = newdata['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+
     return newdata
