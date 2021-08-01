@@ -46,7 +46,6 @@ else:
             if x[0] in sccwrp_field_results.columns
         }
     )
-#sccwrp_field_results = sccwrp_field_results[sccwrp_field_results['SampleDate'] >= pd.Timestamp('05-01-2021')]
 
 try:
     month = int(args.month) if args.month else None
@@ -76,7 +75,7 @@ for c in sccwrp_field_results.columns:
 if sccwrp_field_results.empty:
     print(f"No results found for month {month}")
     sys.exit()
-
+1/0
 start_month = 5
 sccwrp_field_results = sccwrp_field_results[sccwrp_field_results['SampleDate'] >= pd.Timestamp(f'{start_month}-01-2021 00:00:00')]
 # output file path to be used both times the file gets written
