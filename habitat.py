@@ -60,5 +60,12 @@ def habitat(rawdata):
         columns = {v[0]:v[1] for v in zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }, 
         inplace = True
     )
+    #Fix common mistakes
+    habitat_results_dat['AgencyCode'] = habitat_results_dat['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
+    habitat_results_dat['ComplianceCode'] = habitat_results_dat['ComplianceCode'].replace("","NR")
+    habitat_results_dat['BatchVerificationCode'] = habitat_results_dat['BatchVerificationCode'].replace("","NR")
+    habitat_results_dat['CollectionMethodCode'] = habitat_results_dat['CollectionMethodCode'].replace("Habitat_generic","Habitat_Generic")
+    habitat_results_dat['ProtocolCode'] = habitat_results_dat['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+
 
     return habitat_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[habitat_ordered_cols]

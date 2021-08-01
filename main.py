@@ -75,12 +75,18 @@ for c in sccwrp_field_results.columns:
 if sccwrp_field_results.empty:
     print(f"No results found for month {month}")
     sys.exit()
-1/0
+
+# Get all data starting the month
 start_month = 5
-sccwrp_field_results = sccwrp_field_results[sccwrp_field_results['SampleDate'] >= pd.Timestamp(f'{start_month}-01-2021 00:00:00')]
+sccwrp_field_results = sccwrp_field_results[
+                        sccwrp_field_results['SampleDate'] >= pd.Timestamp(
+                            f'{start_month}-01-2021 00:00:00'
+                        )
+]
+
 # output file path to be used both times the file gets written
 # output_filepath = f"output/blm_swampformat_{month_dict[month] if month else ''}.xlsx"
-output_filepath = f"output/blm_swampformat_{start_month}.xlsx"
+output_filepath = f"output/blm_swampformat_from_{month_dict[start_month]}2021.xlsx"
 
 # use xlsxwriter to write the data out without the resqualcode equal signs getting interpreted as formulas
 # I am not sure if openpyxl also has a similar capability, but I do know how to do it with xlsxwriter

@@ -121,7 +121,8 @@ def field(rawdata):
     # fill in the blanks
     field_results_dat = field_results_dat.assign(
         BatchVerificationCode = '', 
-        QACode = 'NR', 
+        QACode = 'NR',
+        ResQualCode = '=', 
         ComplianceCode = '',
         UnitName = field_results_dat \
             .UnitName.fillna("None") \
@@ -158,14 +159,14 @@ def field(rawdata):
         columns = {v[0]:v[1] for v in zip( relmap['columns'][col_filter].OriginalColumn, relmap['columns'][col_filter].Column ) }, 
         inplace = True
     )
-    
+ 
     # return field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
     #     list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
     # ]
     field_results_dat = field_results_dat.sort_values(['StationCode','SampleDate','AnalyteName'])[
           list(chain(list(field_ordered_cols),['OriginalAnalyteName']))
       ]
-
+    field_results_dat = field_results_dat.drop(columns = 'OriginalAnalyteName')
     # Convert from m/s to knots (KTS) if the analyname is Windspeed, and change the unitname to "KTS"  
     field_results_dat.Result = field_results_dat.apply(
                 lambda x: x.Result*1.94384 
@@ -188,6 +189,14 @@ def field(rawdata):
     field_results_dat.loc[field_results_dat.Result == -88,'ResQualCode'] = '='    
     field_results_dat.loc[field_results_dat.Result.isna(),'QACode'] = 'NR'    
     
+    #Fix common mistakes
+    field_results_dat['AgencyCode'] = field_results_dat['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
+    field_results_dat['ComplianceCode'] = field_results_dat['ComplianceCode'].replace("","NR")
+    field_results_dat['BatchVerificationCode'] = field_results_dat['BatchVerificationCode'].replace("","NR")
+    field_results_dat['UnitName'] = field_results_dat['UnitName'].replace("deg C","Deg C")
+    field_results_dat['UnitName'] = field_results_dat['UnitName'].replace("KTS","kts")
+    field_results_dat['ProtocolCode'] = field_results_dat['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+    
+    
     return field_results_dat
-
 
