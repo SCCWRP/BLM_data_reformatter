@@ -106,12 +106,13 @@ as writer:
     personnel(sccwrp_field_results).to_excel(writer, sheet_name = "PersonnelDuty", index = False)
     locations(sccwrp_field_results).to_excel(writer, sheet_name = "Locations", index = False)
     field(sccwrp_field_results).to_excel(writer, sheet_name = "FieldResults", index = False)
-    habitat(sccwrp_field_results).to_excel(writer, sheet_name = "HabitatResults", index = False)
-    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "BenthicResults") \
+    pd.read_excel('info/SWAMP_Field_CollectionResults_Template_v2.5_081420.xlsx', sheet_name = "HabitatResults") \
+        .to_excel(writer, sheet_name = "HabitatResults", index = False)
+    pd.read_excel('info/SWAMP_Field_CollectionResults_Template_v2.5_081420.xlsx', sheet_name = "BenthicResults") \
         .to_excel(writer, sheet_name = "BenthicResults", index = False) 
-    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "ChemResults") \
+    pd.read_excel('info/SWAMP_Field_CollectionResults_Template_v2.5_081420.xlsx', sheet_name = "ChemResults") \
         .to_excel(writer, sheet_name = "ChemResults", index = False) 
-    pd.read_excel('info/BLM_Project_SWAMPformat_Field_CollectionResults.xlsx', sheet_name = "LabBatch") \
+    pd.read_excel('info/SWAMP_Field_CollectionResults_Template_v2.5_081420.xlsx', sheet_name = "LabBatch") \
         .to_excel(writer, sheet_name = "LabBatch", index = False) 
 
     # Save it and we're done!
