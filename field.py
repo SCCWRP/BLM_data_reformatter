@@ -197,6 +197,25 @@ def field(rawdata):
     field_results_dat['UnitName'] = field_results_dat['UnitName'].replace("KTS","kts")
     field_results_dat['ProtocolCode'] = field_results_dat['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
     
-    
+    #Subset dataframe with parameters of interest
+    field_results_dat = field_results_dat[
+                            (field_results_dat['AnalyteName'].isin(['Oxygen, Dissolved','Oxygen, Saturation','pH','Temperature']))
+    ]
+    field_results_dat['drop'] = field_results_dat.apply(
+                                    lambda row: "drop" 
+                                        if all([row['AnalyteName'] == 'Temperature',row['MatrixName'] != 'samplewater'])
+                                        else pd.NA 
+                                    ,axis=1
+    )
+    field_results_dat = field_results_dat[field_results_dat['drop'] != 'drop'].drop(columns = 'drop', axis = 1)
+
+    #Fill empty values in CalibrationDate with Sampledate
+    field_results_dat['CalibrationDate'] = field_results_dat.apply(
+                                            lambda row: row['SampleDate'] 
+                                                if pd.isnull(row['CalibrationDate'])
+                                                else row['CalibrationDate']
+                                                ,axis=1
+    )
+
     return field_results_dat
 

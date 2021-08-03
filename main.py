@@ -53,15 +53,16 @@ except:
     raise Exception(f"The --month argument must be an integer from 1 to 12. You entered the value of {args.month}")
 
 # Project Name should always be Biotic Ligand Model
-sccwrp_field_results = sccwrp_field_results[
-    (sccwrp_field_results.SccwrpProjectName == 'BioticLigandModel')
-    &
-    ( True if month is None else sccwrp_field_results.SampleDate.apply(lambda x: x.month == month) )
-]
+# sccwrp_field_results = sccwrp_field_results[
+#     (sccwrp_field_results.SccwrpProjectName == 'BioticLigandModel')
+#     &
+#     ( True if month is None else sccwrp_field_results.SampleDate.apply(lambda x: x.month == month) )
+# ]
 
 
 # clean up the stations a bit
 sccwrp_field_results.StationID = sccwrp_field_results.StationID.str.replace("BLM-RB4-","")
+sccwrp_field_results = sccwrp_field_results[sccwrp_field_results.StationID.isin(["BC2-Ing", "BC1-Fax", "VR-R1", "VR-R2","VR-R3"])]
 
 # Put hte dates as strings like how SWAMP likes them
 for c in sccwrp_field_results.columns:

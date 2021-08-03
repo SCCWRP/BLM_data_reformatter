@@ -80,5 +80,12 @@ def locations(rawdata):
     newdata.UnitElevation = "m" # This is literally the only value they accept for this column
     newdata['AgencyCode'] = newdata['AgencyCode'].replace("SouthernCaliforniaCoastalWaterResearchProject","SCCWRP")
     newdata['ProtocolCode'] = newdata['ProtocolCode'].replace("MPSL-DFW_Field_v1_1","MPSL-DFW_Field_v1.1")
+    
+    # Fix lookup values and fill null values
+    #Fill empty values in CoordinateSource
+
+    newdata.CoordinateSource = newdata.CoordinateSource.fillna('GPS')
+    newdata['GPSDeviceName'] = newdata['GPSDeviceName'].replace("Phone","Cell Phone")
+    newdata.loc[newdata['StationCode'].isin(["VR-R1","VR-R2", "VR-R3"]) ,'GPSDeviceName']= 'Cell Phone'
 
     return newdata
