@@ -22,7 +22,7 @@ month_dict = {
     5: 'May',  6: 'Jun',  7: 'Jul',  8: 'Aug',
     9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec',
 }
-
+start_month = 8
 if args.file:
     # These will be used to subset the raw data
     rawdatapath = args.file
@@ -78,7 +78,7 @@ if sccwrp_field_results.empty:
     sys.exit()
 
 # Get all data starting the month
-start_month = 5
+
 sccwrp_field_results = sccwrp_field_results[
                         sccwrp_field_results['SampleDate'] >= pd.Timestamp(
                             f'{start_month}-01-2021 00:00:00'
